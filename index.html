@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Hafalan Quran</title>
+    <style>
+        /* Custom CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .form-group input[readonly] {
+            background-color: #f9f9f9;
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: lightseagreen;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+    </style>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // JavaScript untuk mengatur token otomatis
+        function setToken() {
+            const guruSelect = document.getElementById('guru');
+            const tokenInput = document.getElementById('token');
+            const guruData = <?= json_encode($guruList); ?>; // Data guru dari PHP
+
+            guruSelect.addEventListener('change', function () {
+                const selectedGuruId = this.value;
+                const selectedGuru = guruData.find(guru => guru.id == selectedGuruId);
+                if (selectedGuru) {
+                    tokenInput.value = selectedGuru.token; // Set token berdasarkan guru yang dipilih
+                }
+            });
+        }
+
+        // Fungsi untuk memfilter siswa berdasarkan kelas
+        function updateSiswaList() {
+            const kelasSelect = document.getElementById('kelas');
+            const siswaSelect = document.getElementById('siswa');
+            const whatsappInput = document.getElementById('whatsapp');
+            const siswaData = <?= json_encode($siswaList); ?>; // Data siswa dari PHP
+
+            const selectedKelas = kelasSelect.value;
+            const filteredSiswa = siswaData.filter(siswa => siswa.kelas === selectedKelas); // Filter siswa berdasarkan kelas
+
+            siswaSelect.innerHTML = '<option value="">Pilih Nama Siswa</option>';
+            filteredSiswa.forEach(siswa => {
+                const option = document.createElement('option');
+                option.value = siswa.id;
+                option.textContent = siswa.nama;
+                siswaSelect.appendChild(option);
+            });
+
+            whatsappInput.value = ''; // Reset nomor WhatsApp
+        }
+
+        // Fungsi untuk mengisi nomor WhatsApp siswa
+        function updateWhatsapp() {
+            const siswaSelect = document.getElementById('siswa');
+            const whatsappInput = document.getElementById('whatsapp');
+            const siswaData = <?= json_encode($siswaList); ?>; // Data siswa dari PHP
+
+            const selectedSiswaId = siswaSelect.value;
+            const selectedSiswa = siswaData.find(siswa => siswa.id == selectedSiswaId);
+            if (selectedSiswa) {
+                whatsappInput.value = selectedSiswa.whatsapp; // Set nomor WhatsApp
+            }
+        }
+
+        // Memanggil semua fungsi saat halaman dimuat
+        function allFunctions() {
+            setToken(); // Atur token otomatis
+            updateSiswaList(); // Perbarui daftar siswa
+            document.getElementById('kelas').addEventListener('change', updateSiswaList); // Event listener untuk kelas
+            document.getElementById('siswa').addEventListener('change', updateWhatsapp); // Event listener untuk siswa
+        }
+
+        // Jalankan fungsi saat halaman dimuat
+        window.onload = allFunctions;
+    </script>
+</head>
+
+<body>
+    <div style="width: 100%; max-width: 600px; margin: auto; border-radius: 10px; box-shadow: 0px 0px 10px -7px; padding: 20px;">
+        <h2 style="text-align: center;">Form Hafalan Quran</h2>
+        <form action="" method="POST">
+            <!-- Guru -->
+            <div class="mb-3">
+                <label for="guru" class="form-label">Guru</label>
+                <select class="form-select" id="guru" name="guru" required>
+                    <option value="" disabled selected>Pilih Guru</option>
